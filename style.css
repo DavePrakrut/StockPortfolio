@@ -1,0 +1,113 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Portfolio Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #E0E0E0;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1, h2 {
+            color: #BB86FC;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #1E1E1E;
+            border-radius: 8px;
+            overflow: hidden;
+            animation: slideIn 1s ease-out;
+        }
+
+        th {
+            background-color: #BB86FC;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        td:hover {
+            background-color: #333333;
+            transform: scale(1.03);
+        }
+
+        input, button {
+            margin: 10px 0;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #BB86FC;
+            border-color: #BB86FC;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #9B4DFF;
+            border-color: #9B4DFF;
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            background-color: #FF5252;
+            border-color: #FF5252;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-danger:hover {
+            background-color: #FF1744;
+            border-color: #FF1744;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(-30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+
+        /* Light Mode Styles */
+        body.light-mode {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .light-mode table {
+            background-color: #fff;
+            color: #333;
+        }
+
+        .light-mode .btn-primary {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .light-mode .btn-danger {
+            background-color: #FF5252;
+            border-color: #FF5252;
+        }
+
+        /* Add more light mode specific styles as needed */
+
+    </style>
+</head>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Portfolio Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        /* General styling */
+        body {
+            background-color: #121212;
+            color: #E0E0E0;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1, h2 {
+            color: #BB86FC;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        /* Light Mode specific styles */
+        .light-mode {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .light-mode table {
+            background-color: #ffffff;
+        }
+
+        .light-mode .btn-primary {
+            background-color: #6200ea;
+        }
+
+        .light-mode .btn-danger {
+            background-color: #d32f2f;
+        }
+
+        /* Dark Mode Toggle Button */
+        #dark-mode-toggle {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #6200ea;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #dark-mode-toggle:hover {
+            background-color: #9B4DFF;
+            transform: scale(1.1);
+        }
+
+        #dark-mode-toggle:focus {
+            outline: none;
+            box-shadow: 0 0 10px 2px rgba(98, 0, 234, 0.6);
+        }
+
+        #dark-mode-toggle .icon {
+            margin-right: 10px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(-30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Table and Button Styles */
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #1E1E1E;
+            border-radius: 8px;
+            overflow: hidden;
+            animation: slideIn 1s ease-out;
+        }
+
+        th {
+            background-color: #BB86FC;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        td:hover {
+            background-color: #333333;
+            transform: scale(1.03);
+        }
+
+        input, button {
+            margin: 10px 0;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #BB86FC;
+            border-color: #BB86FC;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #9B4DFF;
+            border-color: #9B4DFF;
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            background-color: #FF5252;
+            border-color: #FF5252;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-danger:hover {
+            background-color: #FF1744;
+            border-color: #FF1744;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle Button -->
+    <button id="dark-mode-toggle" class="btn mb-3" style="margin-left: 20px;">
+        <span class="icon">🌙</span> Mode
+    </button>
+    <div class="container mt-5">
+        <h1>Stock Portfolio Management</h1>
+        <div class="mb-3 text-center">
+            <input type="text" id="stock_name" class="form-control w-50 mx-auto" placeholder="Stock Name">
+            <input type="number" id="quantity" class="form-control w-50 mx-auto" placeholder="Quantity">
+            <input type="number" id="price" class="form-control w-50 mx-auto" placeholder="Price">
+            <button class="btn btn-primary" id="add-stock-btn">Add Stock</button>
+        </div>
+
+        <h2>Saved Stocks</h2>
+        <table class="table table-dark table-bordered">
+            <thead>
+                <tr>
+                    <th>Stock Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Date Added</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="stock-table-body"></tbody>
+        </table>
+    </div>
+
+    <!-- Notification Toast (for success/error) -->
+    <div id="notification-toast" class="toast-container"></div>
+
+    <script>
+        // Function to show styled toast notifications
+        function showNotification(message, type = 'success') {
+            const notificationContainer = document.getElementById('notification-toast');
+            const notification = document.createElement('div');
+            notification.className = `toast-message toast-${type}`;
+            notification.innerHTML = `<strong>${message}</strong>`;
+
+            notificationContainer.appendChild(notification);
+
+            // Remove notification after 3.5 seconds
+            setTimeout(() => notification.remove(), 3500);
+        }
+
+        // Function to toggle dark mode
+        document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+            const body = document.body;
+
+            // Toggle the light mode class
+            body.classList.toggle('light-mode');
+
+            // Optional: Save the mode to localStorage to persist across sessions
+            if (body.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+            } else {
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Check and apply saved theme preference from localStorage
+        window.addEventListener('load', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            } else {
+                document.body.classList.remove('light-mode');
+            }
+        });
+
+        // Function to fetch and display stocks
+        async function fetchStocks() {
+            try {
+                const response = await fetch('/view_stocks');
+                const stocks = await response.json();
+                const tableBody = document.getElementById('stock-table-body');
+                tableBody.innerHTML = '';
+
+                if (Array.isArray(stocks) && stocks.length > 0) {
+                    stocks.forEach(stock => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><input type="text" value="${stock.name}" class="form-control edit-name" disabled></td>
+                            <td><input type="number" value="${stock.quantity}" class="form-control edit-quantity" disabled></td>
+                            <td><input type="number" value="${stock.price}" class="form-control edit-price" disabled></td>
+                            <td><input type="date" value="${stock.date}" class="form-control edit-date" disabled></td>
+                            <td>
+                                <button class="btn btn-warning" onclick="enableEditing(this)">Edit</button>
+                                <button class="btn btn-success d-none" onclick="saveEdit(this, '${stock.name}')">Save</button>
+                                <button class="btn btn-danger" onclick="removeStock('${stock.name}', this)">Remove</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching stocks:', error);
+            }
+        }
+
+        // Function to enable editing a stock
+        function enableEditing(button) {
+            const row = button.closest('tr');
+            const inputs = row.querySelectorAll('input');
+            inputs.forEach(input => input.disabled = false);
+            row.querySelector('.btn-success').classList.remove('d-none');
+            button.classList.add('d-none');
+        }
+
+        // Function to save edited stock
+        async function saveEdit(button, originalName) {
+            const row = button.closest('tr');
+            const newName = row.querySelector('.edit-name').value;
+            const newQuantity = row.querySelector('.edit-quantity').value;
+            const newPrice = row.querySelector('.edit-price').value;
+            const newDate = row.querySelector('.edit-date').value;
+
+            try {
+                const response = await fetch('/edit_stock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        original_name: originalName,
+                        new_name: newName,
+                        new_quantity: newQuantity,
+                        new_price: newPrice,
+                        new_date: newDate
+                    })
+                });
+
+                const result = await response.json();
+                showNotification(result.message || result.error);
+                fetchStocks();
+            } catch (error) {
+                console.error('Error editing stock:', error);
+            }
+        }
+
+        // Function to remove a stock
+        async function removeStock(stockName, buttonElement) {
+            try {
+                const response = await fetch(`/remove_stock?stock_name=${encodeURIComponent(stockName)}`, { method: 'DELETE' });
+                const result = await response.json();
+
+                if (result.message) {
+                    showNotification(result.message);
+                    const row = buttonElement.closest('tr');
+                    row.style.transition = 'opacity 0.5s';
+                    row.style.opacity = '0';
+                    setTimeout(() => row.remove(), 500);
+                }
+            } catch (error) {
+                console.error('Error removing stock:', error);
+            }
+        }
+
+        // Add stock event listener
+        document.getElementById('add-stock-btn').addEventListener('click', async () => {
+            const stockName = document.getElementById('stock_name').value;
+            const quantity = document.getElementById('quantity').value;
+            const price = document.getElementById('price').value;
+
+            if (!stockName || !quantity || !price) {
+                showNotification('Please fill in all fields.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/add_stock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stock_name: stockName, quantity: quantity, price: price })
+                });
+
+                const result = await response.json();
+                showNotification(result.message || result.error);
+                fetchStocks();
+            } catch (error) {
+                console.error('Error adding stock:', error);
+            }
+        });
+
+        // Fetch stocks on page load
+        fetchStocks();
+    </script>
+</body>
+</html>
